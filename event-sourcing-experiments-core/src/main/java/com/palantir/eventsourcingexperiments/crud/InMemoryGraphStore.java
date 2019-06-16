@@ -11,9 +11,7 @@ import com.google.common.collect.Multimaps;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.annotation.concurrent.ThreadSafe;
 
-@ThreadSafe
 public final class InMemoryGraphStore implements GraphStore {
 
     private final Set<Integer> nodes = Collections.newSetFromMap(new ConcurrentHashMap<>());
