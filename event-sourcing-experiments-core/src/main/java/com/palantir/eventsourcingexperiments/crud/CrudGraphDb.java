@@ -7,7 +7,7 @@ package com.palantir.eventsourcingexperiments.crud;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.Graphs;
 import com.google.common.graph.MutableGraph;
-import com.palantir.eventsourcingexperiments.MoreGraphs;
+import com.palantir.eventsourcingexperiments.graphs.MoreGraphs;
 import com.palantir.eventsourcingexperiments.api.GraphDb;
 import java.util.Set;
 

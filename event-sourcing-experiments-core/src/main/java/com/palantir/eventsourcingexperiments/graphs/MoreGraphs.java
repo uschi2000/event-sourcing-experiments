@@ -2,7 +2,7 @@
  * (c) Copyright 2019 Palantir Technologies Inc. All rights reserved.
  */
 
-package com.palantir.eventsourcingexperiments;
+package com.palantir.eventsourcingexperiments.graphs;
 
 import com.google.common.graph.Graph;
 import com.google.common.graph.Traverser;

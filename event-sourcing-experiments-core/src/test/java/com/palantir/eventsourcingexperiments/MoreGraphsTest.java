@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
+import com.palantir.eventsourcingexperiments.graphs.MoreGraphs;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
