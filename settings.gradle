@@ -1,0 +1,3 @@
+rootProject.name = 'event-sourcing-experiments'
+
+include 'event-sourcing-experiments-core'
