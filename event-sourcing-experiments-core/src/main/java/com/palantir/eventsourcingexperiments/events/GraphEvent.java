@@ -6,12 +6,12 @@ package com.palantir.eventsourcingexperiments.events;
 
 public interface GraphEvent {
 
-    public static NodeAdded nodeAdded(int nodeId) {
-        return new NodeAdded(nodeId);
+    static NodeAdded nodeAdded(int nodeId, int seqId) {
+        return new NodeAdded(nodeId, seqId);
     }
 
-    public static EdgeAdded edgeAdded(int from, int to) {
-        return new EdgeAdded(from, to);
+    static EdgeAdded edgeAdded(int from, int to, int seqId) {
+        return new EdgeAdded(from, to, seqId);
     }
 
     interface Visitor {
@@ -20,12 +20,15 @@ public interface GraphEvent {
     }
 
     void accept(Visitor visitor);
+    int seqId();
 
     final class NodeAdded implements GraphEvent {
         private final int nodeId;
+        private final int seqId;
 
-        private NodeAdded(int nodeId) {
+        private NodeAdded(int nodeId, int seqId) {
             this.nodeId = nodeId;
+            this.seqId = seqId;
         }
 
         public int getNodeId() {
@@ -36,15 +39,22 @@ public interface GraphEvent {
         public void accept(Visitor visitor) {
             visitor.visit(this);
         }
+
+        @Override
+        public int seqId() {
+            return seqId;
+        }
     }
 
     final class EdgeAdded implements GraphEvent {
         private final int from;
         private final int to;
+        private final int seqId;
 
-        private EdgeAdded(int from, int to) {
+        private EdgeAdded(int from, int to, int seqId) {
             this.from = from;
             this.to = to;
+            this.seqId = seqId;
         }
 
         public int getFrom() {
@@ -58,6 +68,11 @@ public interface GraphEvent {
         @Override
         public void accept(Visitor visitor) {
             visitor.visit(this);
+        }
+
+        @Override
+        public int seqId() {
+            return seqId;
         }
     }
 }

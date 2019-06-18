@@ -4,6 +4,7 @@
 
 package com.palantir.eventsourcingexperiments.events;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -16,9 +17,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public final class InMemoryEventStoreTest {
 
-    private static final GraphEvent.NodeAdded E1 = GraphEvent.nodeAdded(1);
-    private static final GraphEvent.EdgeAdded E2 = GraphEvent.edgeAdded(1, 2);
-    private static final GraphEvent.EdgeAdded E3 = GraphEvent.edgeAdded(1, 3);
+    private static final GraphEvent.NodeAdded E1 = GraphEvent.nodeAdded(1, 0);
+    private static final GraphEvent.EdgeAdded E2 = GraphEvent.edgeAdded(1, 2, 1);
+    private static final GraphEvent.EdgeAdded E3 = GraphEvent.edgeAdded(1, 3, 2);
 
     private EventStore store;
     @Mock private GraphEvent.Visitor observer1;
@@ -60,5 +61,14 @@ public final class InMemoryEventStoreTest {
 
         store.put(E3);
         verify(observer1).visit(E3);
+    }
+
+    @Test
+    public void doesNotAcceptOutOfOrderEvents() {
+        assertThat(store.put(E2)).isFalse();
+        assertThat(store.put(E1)).isTrue();
+        assertThat(store.put(E3)).isFalse();
+        assertThat(store.put(E2)).isTrue();
+        assertThat(store.put(E3)).isTrue();
     }
 }

@@ -7,8 +7,8 @@ package com.palantir.eventsourcingexperiments.crud;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.Graphs;
 import com.google.common.graph.MutableGraph;
-import com.palantir.eventsourcingexperiments.graphs.MoreGraphs;
 import com.palantir.eventsourcingexperiments.api.GraphDb;
+import com.palantir.eventsourcingexperiments.graphs.MoreGraphs;
 import java.util.Set;
 
 /**
@@ -56,7 +56,6 @@ public final class CrudGraphDb implements GraphDb {
             }
 
             graph.putEdge(from, to);
-            System.out.println(graph);
             if (Graphs.hasCycle(graph)) {
                 return false;
             }

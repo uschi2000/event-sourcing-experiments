@@ -6,7 +6,17 @@ package com.palantir.eventsourcingexperiments;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.graph.Graph;
+import com.google.common.graph.Graphs;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.palantir.eventsourcingexperiments.api.GraphDb;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.Executors;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,11 +25,12 @@ public abstract class AbstractGraphDbTest {
     // TODO(rfink): Lot of missing test coverage here... let's ignore it for the sake of the example.
 
     protected abstract GraphDb createGraphDb();
+    protected abstract Graph<Integer> getGraph();
 
     private GraphDb graph;
 
     @Before
-    public void before() {
+    public void beforeAbstractGraphDbTest() {
         graph = createGraphDb();
     }
 
@@ -96,5 +107,42 @@ public abstract class AbstractGraphDbTest {
         graph.addEdgeAcyclic(1, 2);
         assertThat(graph.connected(1, 2)).isTrue();
         assertThat(graph.connected(2, 1)).isTrue();
+    }
+
+    @Test(timeout = 5000)
+    public void addNodeIsThreadSafe() throws Exception {
+        ListeningExecutorService executor = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(4));
+        int numNodes = 1000;
+        List<ListenableFuture<?>> futures = new ArrayList<>(numNodes);
+        for (int i = 0; i < numNodes; ++i) {
+            int nodeId = i;
+            futures.add(executor.submit(() -> graph.addNode(nodeId)));
+        }
+        Futures.allAsList(futures).get();
+        assertThat(getGraph().nodes()).hasSize(numNodes);
+    }
+
+    @Test(timeout = 5000)
+    public void addEdgeAcyclicIsThreadSafe() throws Exception {
+        ListeningExecutorService executor = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(4));
+        int numNodes = 100;
+        List<ListenableFuture<?>> futures = new ArrayList<>(numNodes + numNodes * numNodes);
+        for (int i = 0; i < numNodes; ++i) {
+            int nodeId = i;
+            futures.add(executor.submit(() -> graph.addNode(nodeId)));
+        }
+        Random random = new Random(0);
+        for (int i = 0; i < numNodes * numNodes; ++i) {
+            int from = random.nextInt(numNodes);
+            int to = random.nextInt(numNodes);
+            if (from == to) {
+                to += 1;
+            }
+            int theTo = to;
+            futures.add(executor.submit(() -> graph.addEdgeAcyclic(from, theTo)));
+        }
+
+        Futures.allAsList(futures).get();
+        assertThat(Graphs.hasCycle(getGraph())).isFalse();
     }
 }
