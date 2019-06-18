@@ -109,10 +109,10 @@ public abstract class AbstractGraphDbTest {
         assertThat(graph.connected(2, 1)).isTrue();
     }
 
-    @Test(timeout = 5000)
+    @Test(timeout = 10_000)
     public void addNodeIsThreadSafe() throws Exception {
         ListeningExecutorService executor = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(4));
-        int numNodes = 1000;
+        int numNodes = 200;
         List<ListenableFuture<?>> futures = new ArrayList<>(numNodes);
         for (int i = 0; i < numNodes; ++i) {
             int nodeId = i;
@@ -122,7 +122,7 @@ public abstract class AbstractGraphDbTest {
         assertThat(getGraph().nodes()).hasSize(numNodes);
     }
 
-    @Test(timeout = 5000)
+    @Test(timeout = 10_000)
     public void addEdgeAcyclicIsThreadSafe() throws Exception {
         ListeningExecutorService executor = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(4));
         int numNodes = 100;
