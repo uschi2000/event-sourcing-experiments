@@ -6,9 +6,9 @@ package uschi2000.eventsourcingexperiments.crud;
 
 /** A dummy interface representation a distributed/shared lock. */
 public interface DistributedLock {
-    /** See {@Lock}. */
+    /** See {@link java.util.concurrent.locks.Lock}. */
     void lock();
 
-    /** See {@Lock}. */
+    /** See {@link java.util.concurrent.locks.Lock}. */
     void unlock();
 }
