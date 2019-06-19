@@ -4,7 +4,7 @@
 
 version: 2
 jobs:
-  build-11:
+  build:
     docker: [{ image: 'circleci/openjdk:11-node' }]
     resource_class: xlarge
     environment:
@@ -33,6 +33,6 @@ workflows:
   version: 2
   build:
     jobs:
-      - build-11:
+      - build:
           # CircleCI2 will ignore tags without this. https://circleci.com/docs/2.0/workflows/#git-tag-job-execution
           filters: { tags: { only: /.*/ } }
