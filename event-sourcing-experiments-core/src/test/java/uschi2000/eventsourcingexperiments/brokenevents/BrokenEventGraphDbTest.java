@@ -20,7 +20,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
-import uschi2000.eventsourcingexperiments.api.GraphDb;
+import uschi2000.eventsourcingexperiments.GraphDb;
 import uschi2000.eventsourcingexperiments.events.InMemoryEventStore;
 
 @RunWith(MockitoJUnitRunner.class)

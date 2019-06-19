@@ -7,7 +7,7 @@ package uschi2000.eventsourcingexperiments.events;
 import com.google.common.graph.Graph;
 import com.google.common.graph.Graphs;
 import com.google.common.graph.MutableGraph;
-import uschi2000.eventsourcingexperiments.api.GraphDb;
+import uschi2000.eventsourcingexperiments.GraphDb;
 import uschi2000.eventsourcingexperiments.brokenevents.BrokenEventGraphDb;
 import uschi2000.eventsourcingexperiments.crud.CrudGraphDb;
 import uschi2000.eventsourcingexperiments.graphs.MoreGraphs;

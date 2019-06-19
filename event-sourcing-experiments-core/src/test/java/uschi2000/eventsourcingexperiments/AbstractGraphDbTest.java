@@ -17,7 +17,6 @@ import java.util.Random;
 import java.util.concurrent.Executors;
 import org.junit.Before;
 import org.junit.Test;
-import uschi2000.eventsourcingexperiments.api.GraphDb;
 
 public abstract class AbstractGraphDbTest {
 

@@ -9,7 +9,7 @@ import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.Graphs;
 import com.google.common.graph.MutableGraph;
 import java.util.Set;
-import uschi2000.eventsourcingexperiments.api.GraphDb;
+import uschi2000.eventsourcingexperiments.GraphDb;
 import uschi2000.eventsourcingexperiments.graphs.MoreGraphs;
 
 /**

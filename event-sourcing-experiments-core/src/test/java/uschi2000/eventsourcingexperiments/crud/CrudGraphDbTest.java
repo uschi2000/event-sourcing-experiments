@@ -7,7 +7,7 @@ package uschi2000.eventsourcingexperiments.crud;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import uschi2000.eventsourcingexperiments.AbstractGraphDbTest;
-import uschi2000.eventsourcingexperiments.api.GraphDb;
+import uschi2000.eventsourcingexperiments.GraphDb;
 
 @RunWith(MockitoJUnitRunner.class)
 public final class CrudGraphDbTest extends AbstractGraphDbTest {
