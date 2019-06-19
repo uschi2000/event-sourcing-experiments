@@ -47,13 +47,17 @@ public final class InMemoryEventStore implements EventStore {
     }
 
     @Override
-    public void subscribe(GraphEvent.Visitor observer) {
+    public void subscribe(GraphEvent.Visitor observer, int latestKnownSeqId) {
         Lock writing = subscribersLock.writeLock();
         writing.lock();
         try {
             subscribers.add(observer);
             // It's safe to iterate here because nobody can mutate the events queue because we're holding the write lock
-            events.iterator().forEachRemaining(event -> event.accept(observer));
+            events.iterator().forEachRemaining(event -> {
+                if (event.seqId() > latestKnownSeqId) {
+                    event.accept(observer);
+                }
+            });
         } finally {
             writing.unlock();
         }

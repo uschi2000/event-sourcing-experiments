@@ -4,6 +4,7 @@
 
 package com.palantir.eventsourcingexperiments.crud;
 
+import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.Graphs;
 import com.google.common.graph.MutableGraph;
@@ -80,6 +81,11 @@ public final class CrudGraphDb implements GraphDb {
         } finally {
             lock.unlock();
         }
+    }
+
+    @Override
+    public Graph<Integer> getGraph() {
+        return readFromStore();
     }
 
     // Must be executed under lock.

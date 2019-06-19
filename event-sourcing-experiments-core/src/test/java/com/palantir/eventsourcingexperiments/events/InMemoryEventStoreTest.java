@@ -5,6 +5,7 @@
 package com.palantir.eventsourcingexperiments.events;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -38,8 +39,8 @@ public final class InMemoryEventStoreTest {
 
     @Test
     public void existingSubscribersReceiveNewEvents() {
-        store.subscribe(observer1);
-        store.subscribe(observer2);
+        store.subscribe(observer1, -1);
+        store.subscribe(observer2, -1);
 
         store.put(E1);
         store.put(E2);
@@ -54,10 +55,22 @@ public final class InMemoryEventStoreTest {
     public void newSubscribersReceiveOldEventsAndThenListenLive() {
         store.put(E1);
         store.put(E2);
-        store.subscribe(observer1);
+        store.subscribe(observer1, -1);
         verify(observer1).visit(E1);
         verify(observer1).visit(E2);
         verifyNoMoreInteractions(observer1);
+
+        store.put(E3);
+        verify(observer1).visit(E3);
+    }
+
+    @Test
+    public void canSubscribeToEventsAfterAGivenSeqId() {
+        store.put(E1);
+        store.put(E2);
+        store.subscribe(observer1, E1.seqId());
+        verify(observer1, never()).visit(E1);
+        verify(observer1).visit(E2);
 
         store.put(E3);
         verify(observer1).visit(E3);

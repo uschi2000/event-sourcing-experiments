@@ -4,28 +4,54 @@
 
 package com.palantir.eventsourcingexperiments.events;
 
+import com.google.common.graph.Graph;
 import com.google.common.graph.Graphs;
 import com.google.common.graph.MutableGraph;
 import com.palantir.eventsourcingexperiments.api.GraphDb;
 import com.palantir.eventsourcingexperiments.graphs.MoreGraphs;
 
+/**
+ * An event-sourced implementation of the {@link GraphDb graph database}. This implementation fixes the
+ * concurrency problems in {@link com.palantir.eventsourcingexperiments.brokenevents.BrokenEventGraphDb} by
+ * introducing transactional coupling between constraint checking (e.g., "is the resulting graph acyclic?") and state
+ * mutation (e.g., "add this edge"). The coupling is done by enforcing a dense order of the mutation events: if we
+ * check the graph constraints at event sequence number N, then we insert the mutation event at sequence number N+1;
+ * by construction, no other mutation can occur in between and thus the constraints are guaranteed to be met after
+ * the N+1 mutation.
+ * <p>
+ * This simple example demonstrates the structural similarities between the CRUD approach (see
+ * {@link com.palantir.eventsourcingexperiments.crud.CrudGraphDb}) and the event-sourced approach: in both cases, we
+ * need to linearize state mutations in order to validate the graph constraints and perform the mutation atomically /
+ * transactionally. In the CRUD implementation, we chose to linearize mutations with a distributed lock; in the
+ * event-sourced implementation, we chose to linearize mutations with a {@link EventStore dense, ordered sequence of
+ * mutation events}. Note that this difference is by choice and is not a principled difference between the CRUD and
+ * the event-sourced approaches: for instance, we could linearize the mutations with locks in the event-sourced
+ * implementation.
+ * <p>
+ * The optimistic locking approach chosen here exhibits the typical performance penalty when N users perform
+ * concurrent mutations: N-1 out of N concurrent mutation attempts fail because their optimistic lock on the sequence
+ * number eventually fails; notably, these N-1 attempts have already done the constraint checking, thus wasting a lot
+ * of compute time. A better strategy would be to linearize the mutations: locally via a synchronized queue, or in a
+ * distributed system via leader election. Interestingly, one of the main selling points of the event-sourced design
+ * seems to evaporate (at least in theory): due to the performance penalty of optimistic locking, we should pick a
+ * single actor to perform all mutations, or we should use distributed locks to coordinate... just like in a
+ * transactional CRUD store.
+ */
 public final class EventGraphDb implements GraphDb {
 
     private final EventStore events;
     private final MemoryImage graphImage;
 
-    public EventGraphDb(EventStore events, MemoryImage graphImage) {
+    public EventGraphDb(EventStore events, GraphStore snapshots) {
         this.events = events;
-        this.graphImage = graphImage;
-
-        events.subscribe(graphImage);
+        this.graphImage = new MemoryImage(events, snapshots);
     }
 
     @Override
     public boolean addNode(int nodeId) {
         boolean eventSubmitted = false;
         while (!eventSubmitted) {
-            MemoryImage.VersionedGraph currentGraph = graphImage.graph();
+            VersionedGraph currentGraph = graphImage.graph();
             if (currentGraph.graph().nodes().contains(nodeId)) {
                 // Note that this is a bit funny for non-monotonic graphs: we fail here as soon as we observe a graph
                 // that contains nodeId, even though that node may get removed later... how long are you willing to
@@ -44,7 +70,7 @@ public final class EventGraphDb implements GraphDb {
     public boolean addEdgeAcyclic(int from, int to) {
         boolean eventSubmitted = false;
         while (!eventSubmitted) {
-            MemoryImage.VersionedGraph currentGraph = graphImage.graph();
+            VersionedGraph currentGraph = graphImage.graph();
             if (!(currentGraph.graph().nodes().contains(from) && currentGraph.graph().nodes().contains(to))) {
                 return false;
             }
@@ -59,10 +85,6 @@ public final class EventGraphDb implements GraphDb {
                 return false;
             }
 
-            // The following construction couples the state checking of graph (contains nodes, does not contain edge,
-            // is acyclic) with the state mutation: we check the constraints on a graph at version seqId and then insert
-            // the edgeAdded event at seqId + 1. By construction, no other mutation can be inserted in between seqId
-            // and seqId + 1 and thus we're guaranteed to update the graph correctly.
             eventSubmitted = events.put(GraphEvent.edgeAdded(from, to, currentGraph.getSeqId() + 1));
         }
         return true;
@@ -71,5 +93,10 @@ public final class EventGraphDb implements GraphDb {
     @Override
     public boolean connected(int from, int to) {
         return MoreGraphs.connected(graphImage.graph().graph(), from, to);
+    }
+
+    @Override
+    public Graph<Integer> getGraph() {
+        return graphImage.graph().graph();
     }
 }

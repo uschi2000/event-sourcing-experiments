@@ -6,7 +6,6 @@ package com.palantir.eventsourcingexperiments;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.common.graph.Graph;
 import com.google.common.graph.Graphs;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -25,7 +24,6 @@ public abstract class AbstractGraphDbTest {
     // TODO(rfink): Lot of missing test coverage here... let's ignore it for the sake of the example.
 
     protected abstract GraphDb createGraphDb();
-    protected abstract Graph<Integer> getGraph();
 
     private GraphDb graph;
 
@@ -119,7 +117,7 @@ public abstract class AbstractGraphDbTest {
             futures.add(executor.submit(() -> graph.addNode(nodeId)));
         }
         Futures.allAsList(futures).get();
-        assertThat(getGraph().nodes()).hasSize(numNodes);
+        assertThat(graph.getGraph().nodes()).hasSize(numNodes);
     }
 
     @Test(timeout = 10_000)
@@ -143,6 +141,6 @@ public abstract class AbstractGraphDbTest {
         }
 
         Futures.allAsList(futures).get();
-        assertThat(Graphs.hasCycle(getGraph())).isFalse();
+        assertThat(Graphs.hasCycle(graph.getGraph())).isFalse();
     }
 }
