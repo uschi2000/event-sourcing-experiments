@@ -4,22 +4,17 @@
 
 package uschi2000.eventsourcingexperiments.graphs;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Graph;
 import com.google.common.graph.Traverser;
+import java.util.Set;
 
 public final class MoreGraphs {
 
     private MoreGraphs() {}
 
-    /** Returns true iff nodes from and to are connected int he given graph. */
-    public static <V> boolean connected(Graph<V> graph, V from, V to) {
-        Traverser<V> traverser = Traverser.forGraph(graph);
-        for (V seen : traverser.breadthFirst(from)) {
-            if (to.equals(seen)) {
-                return true;
-            }
-        }
-
-        return false;
+    /** Returns the set of nodes reachable from a given seed node. */
+    public static <V> Set<V> reachable(Graph<V> graph, V seed) {
+        return ImmutableSet.copyOf(Traverser.forGraph(graph).breadthFirst(seed));
     }
 }

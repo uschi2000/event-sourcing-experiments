@@ -71,6 +71,7 @@ public final class MemoryImage implements GraphEvent.Visitor {
         }
     }
 
+    // TODO(rfink): In a real system this should happen asynchronously rather than on the request thread.
     private void maybePersistSnapshot() {
         if (mutationCounter.accumulateAndGet(1 /* ignored */, (prev, ignored) -> (prev + 1) % SNAPSHOT_FREQ) == 0) {
             snapshots.put(graph());

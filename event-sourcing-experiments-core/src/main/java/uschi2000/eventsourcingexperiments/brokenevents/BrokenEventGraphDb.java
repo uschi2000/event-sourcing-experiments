@@ -7,6 +7,7 @@ package uschi2000.eventsourcingexperiments.brokenevents;
 import com.google.common.graph.Graph;
 import com.google.common.graph.Graphs;
 import com.google.common.graph.MutableGraph;
+import java.util.Set;
 import uschi2000.eventsourcingexperiments.GraphDb;
 import uschi2000.eventsourcingexperiments.events.EventStore;
 import uschi2000.eventsourcingexperiments.events.GraphEvent;
@@ -55,8 +56,8 @@ public final class BrokenEventGraphDb implements GraphDb {
     }
 
     @Override
-    public boolean connected(int from, int to) {
-        return MoreGraphs.connected(graphImage.graph(), from, to);
+    public Set<Integer> reachable(int seed) {
+        return MoreGraphs.reachable(graphImage.graph(), seed);
     }
 
     @Override

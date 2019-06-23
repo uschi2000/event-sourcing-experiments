@@ -6,6 +6,7 @@ package uschi2000.eventsourcingexperiments;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.graph.Graph;
+import java.util.Set;
 
 /** A simple dummy graph database API for maintaining acyclic graphs. */
 public interface GraphDb {
@@ -18,8 +19,8 @@ public interface GraphDb {
      */
     boolean addEdgeAcyclic(int from, int to);
 
-    /** Returns true iff the two given nodes exist and the exists a path between the nodes in the graph. */
-    boolean connected(int from, int to);
+    /** Returns the set of nodes reachable from a given seed node. */
+    Set<Integer> reachable(int seed);
 
     // Bit of a hack, just for demonstration/testing purposes
     @VisibleForTesting
