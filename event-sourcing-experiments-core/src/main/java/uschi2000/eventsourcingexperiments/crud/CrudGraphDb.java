@@ -4,6 +4,7 @@
 
 package uschi2000.eventsourcingexperiments.crud;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.Graphs;
@@ -70,14 +71,14 @@ public final class CrudGraphDb implements GraphDb {
     }
 
     @Override
-    public boolean connected(int from, int to) {
+    public Set<Integer> reachable(int seed) {
         lock.lock();
         try {
-            if (!(containsNode(from) && containsNode(to))) {
-                return false;
+            if (!containsNode(seed)) {
+                return ImmutableSet.of();
             }
 
-            return MoreGraphs.connected(readFromStore(), from, to);
+            return MoreGraphs.reachable(readFromStore(), seed);
         } finally {
             lock.unlock();
         }

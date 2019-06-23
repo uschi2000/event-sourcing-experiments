@@ -95,15 +95,13 @@ public abstract class AbstractGraphDbTest {
     }
 
     @Test
-    public void detectsConnectedNodes() {
+    public void findsReachableNodes() {
         graph.addNode(1);
         graph.addNode(2);
-        assertThat(graph.connected(1, 1)).isTrue();
-        assertThat(graph.connected(1, 2)).isFalse();
+        assertThat(graph.reachable(1)).contains(1);
 
         graph.addEdgeAcyclic(1, 2);
-        assertThat(graph.connected(1, 2)).isTrue();
-        assertThat(graph.connected(2, 1)).isTrue();
+        assertThat(graph.reachable(2)).contains(1, 2);
     }
 
     @Test(timeout = 10_000)
