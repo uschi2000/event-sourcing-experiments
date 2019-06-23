@@ -21,7 +21,7 @@ public final class MoreGraphsTest {
         graph.addNode(1);
         graph.addNode(2);
         graph.addNode(3);
-       
+
         assertThat(MoreGraphs.reachable(graph, 1)).contains(1);
         assertThat(MoreGraphs.reachable(graph, 2)).contains(2);
         assertThat(MoreGraphs.reachable(graph, 3)).contains(3);
